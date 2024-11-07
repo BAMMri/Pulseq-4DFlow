@@ -318,7 +318,6 @@ if __name__ == "__main__":
     FOV = [180e-3, 120e-3, 100e-3]
     VENC = 1.0
 
-    from flow_comp_gre_class_F import MRISequence
     seq = MRISequence(
         TE=4.5e-3,
         TR=8e-3,
