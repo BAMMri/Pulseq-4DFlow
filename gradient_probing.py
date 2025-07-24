@@ -6,7 +6,6 @@ import numpy as np
 import pypulseq as pp
 import sys
 
-sys.path.append('/home/marta/gropt/python')
 import gropt
 import math
 from scipy.signal import medfilt
