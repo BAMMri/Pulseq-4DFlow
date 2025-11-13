@@ -11,7 +11,7 @@ This repository contains several Pulseq-based 4D flow sequences for testing and 
 - **gradient_probing** – Asequnce to be run once before any scans to map the physical direction of the gradiens on your specific system.  
 - **Undersampling_arteries** – Application of the undersampled sequence for neurovascular application (this version is for a 3T Siemens Vida scanner).  
 - **Undersampling_leg** – Version adapted for lower limb (leg) imaging (this version is for a 3T Siemens Vida Fit scanner).  
-- **Undersampling_arm** – Version adapted for upper limb (forearm) imaging (this version is for a 3T Siemens Prisma scanner).
+- **Undersampling_forearm** – Version adapted for upper limb (forearm) imaging (this version is for a 3T Siemens Prisma scanner).
 
 Each sequence produces a `.seq` file that can be executed on the scanner using PyPulseq.
 
