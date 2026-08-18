@@ -380,7 +380,7 @@ class MRISequence:
             'gmax': 50,
             'smax': 110.0,
             'moment_params': moment_params,
-            'TE': 3.3
+            'TE': 3.4
         }
 
         if additional_params:
@@ -540,16 +540,16 @@ class MRISequence:
         adc.dwell = np.round(adc.dwell / self.seq.adc_raster_time) * self.seq.adc_raster_time
         # smooth waveforms
         gx_vel.tt, gx_vel.waveform = self.smooth_gradient(gx_vel.tt, gx_vel.waveform, 'x', start_smooth=0.0e-3,
-                                                          end_smooth=3.29e-3,  # 5.055e-3,
+                                                          end_smooth=3.39e-3,  # 5.055e-3,
                                                           filter_size=11, plot=False, threshold=1e4)
 
         gz_vel.tt, gz_vel.waveform = self.smooth_gradient(gz_vel.tt, gz_vel.waveform, 'z', start_smooth=0.0e-3,
-                                                          end_smooth=3.29e-3,  # 5.055e-3,
+                                                          end_smooth=3.39e-3,  # 5.055e-3,
                                                           filter_size=11, plot=False, threshold=1e4)
 
         gy_vel.tt, gy_vel.waveform = self.smooth_gradient(gy_vel.tt, gy_vel.waveform, 'y',
                                                           start_smooth=0.0e-3,
-                                                          end_smooth=3.29e-3,  # 5.055e-3,
+                                                          end_smooth=3.39e-3,  # 5.055e-3,
                                                           filter_size=11, plot=False, threshold=1e4)
         # print(gy_vel.tt, gy_vel.waveform)
         # assemble sequence
