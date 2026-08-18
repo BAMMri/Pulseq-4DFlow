@@ -517,8 +517,9 @@ class MRISequence:
         gz_vel = self.make_gradient('z', z_moment_params, flow_g_start=flow_g_start,
                                     additional_params={'gmax': 50, 'smax': 110.0})
         # spoiling
-        gx_spoil = pp.make_trapezoid(channel='x', area=2 * self.Nx * self.delta_kx, system=self.sys)
-        gz_spoil = pp.make_trapezoid(channel='z', area=4 / self.slice_thickness - areaz, system=self.sys)
+        gx_spoil = pp.make_trapezoid(channel='x', area=self.crusher_x_cycles * self.Nx * self.delta_kx, system=self.sys)
+        gz_spoil = pp.make_trapezoid(channel='z', area=self.crusher_z_cycles / self.slice_thickness - areaz,
+                                     system=self.sys)
 
         # calculate delays
         delay_TE = math.ceil((self.TE - pp.calc_duration(gx_vel) - gz.fall_time - gz.flat_time / 2
