@@ -83,7 +83,10 @@ def setup_sampling(Ny, Nz, fov, undersampling_factor=9, center_percent_y=24, cen
     return list(zip(ky_coords, kz_coords))
 
 
-def generate_phase_samples(Ny, Nz, fov, num_phases, undersampling_factor=9, center_percent_y=24, center_percent_z=23, base_seed=32):
+def __init__(self, TE, TR, fov, Nx, Ny, Nz, Nslices, venc, slice_thickness, alpha, bandwidth, tbw, heart_rate,
+                 undersampling_factor,
+                 center_percent_y=20, center_percent_z=20, rf_spoil_inc=117.0,
+                 crusher_x_cycles=2, crusher_z_cycles=4):
     phase_samples = []
     min_samples = float('inf')
 
@@ -135,7 +138,7 @@ class MRISequence:
         self.delta_kz = 1 / fov[2]
 
         # Constants
-        self.RF_SPOIL_INC = 117.0
+        self.RF_SPOIL_INC = rf_spoil_inc
         self.gradient_cache = {}
 
         # Initialize sequence object
@@ -149,10 +152,17 @@ class MRISequence:
 
         # Poisson disc sampling
         self.undersampling_factor = undersampling_factor
+        self.undersampling_factor = undersampling_factor
+        self.center_percent_y = center_percent_y
+        self.center_percent_z = center_percent_z
+        self.crusher_x_cycles = crusher_x_cycles
+        self.crusher_z_cycles = crusher_z_cycles
         self.heart_rate = heart_rate
         self.max_phases = int(math.floor(self.heart_rate/(8 * self.TR)))
         #self.max_phases = 1
-        testphase_samples = generate_phase_samples(self.Ny, self.Nz, self.fov, self.max_phases, base_seed=32)
+        testphase_samples = generate_phase_samples(self.Ny, self.Nz, self.fov, self.max_phases, undersampling_factor=self.undersampling_factor, base_seed=32,
+                                                   center_percent_y=self.center_percent_y,
+                                                   center_percent_z=self.center_percent_z)
         self.phase_samples = np.array(testphase_samples)
         self.elliptical_scanning=True
         #self.samples, self.tree = setup_sampling(self.Nx, self.Ny, self.Nz, self.fov)
@@ -220,6 +230,10 @@ class MRISequence:
 
             # Acceleration and Dynamic parameters
             'undersampling_factor': self.undersampling_factor,
+            'fullysampled_center': [
+                int((self.center_percent_y / 100) * self.Ny),
+                int((self.center_percent_z / 100) * self.Nz)
+                ],
             'venc': self.venc.tolist() if hasattr(self.venc, 'tolist') else self.venc,
             #'n_phases': self.phase_samples.tolist() if hasattr(self.phase_samples, 'tolist') else self.phase_samples,
             'CardiacNumberofImages': len(self.phase_samples),
@@ -585,9 +599,12 @@ if __name__ == "__main__":
     FOV = [150e-3, 100e-3, 80e-3]
     VENC = 0.16
 
-    seq = MRISequence(TE=4.7e-3, TR=7e-3, fov=FOV, Nx=int(np.ceil(FOV[0] / RESOLUTION[0])),Ny=int(np.ceil(FOV[1] / RESOLUTION[1])),Nz=int(np.ceil(FOV[2] / RESOLUTION[2])),
-                      Nslices=6, venc=VENC, slice_thickness=80e-3, alpha=10, bandwidth=1e3, tbw=2, heart_rate=TRIG_TIME,undersampling_factor=9)
-
+    seq = MRISequence(TE=4.7e-3, TR=7e-3, fov=FOV, Nx=int(np.ceil(FOV[0] / RESOLUTION[0])),
+                      Ny=int(np.ceil(FOV[1] / RESOLUTION[1])), Nz=int(np.ceil(FOV[2] / RESOLUTION[2])),
+                      Nslices=6, venc=VENC, slice_thickness=80e-3, alpha=10, bandwidth=1e3, tbw=2, heart_rate=TRIG_TIME,
+                      undersampling_factor=9,
+                      center_percent_y=20, center_percent_z=20, rf_spoil_inc=117.0,
+                      crusher_x_cycles=2, crusher_z_cycles=4)
     # M1 values in mT*ms^2/m
     venc_values = [
         (0, 0, 0),
