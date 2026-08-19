@@ -114,7 +114,10 @@ def is_within_ellipse(y, z, y_max, z_max, ellipse_radius):
 
 
 class MRISequence:
-    def __init__(self, TE, TR, fov, Nx, Ny, Nz, Nslices, venc, slice_thickness, alpha, bandwidth, tbw, heart_rate, undersampling_factor):
+    def __init__(self, TE, TR, fov, Nx, Ny, Nz, Nslices, venc, slice_thickness, alpha, bandwidth, tbw, heart_rate,
+                 undersampling_factor,
+                 center_percent_y=20, center_percent_z=35, rf_spoil_inc=117.0,
+                 crusher_x_cycles=2, crusher_z_cycles=4):
         # Initialize sequence parameters
         self.TE = TE
         self.TR = TR
@@ -135,7 +138,7 @@ class MRISequence:
         self.delta_kz = 1 / fov[2]
 
         # Constants
-        self.RF_SPOIL_INC = 117.0
+        self.RF_SPOIL_INC = rf_spoil_inc
         self.gradient_cache = {}
 
         # Initialize sequence object
@@ -149,10 +152,16 @@ class MRISequence:
 
         # Poisson disc sampling
         self.undersampling_factor = undersampling_factor
+        self.center_percent_y = center_percent_y
+        self.center_percent_z = center_percent_z
+        self.crusher_x_cycles = crusher_x_cycles
+        self.crusher_z_cycles = crusher_z_cycles
         self.heart_rate = heart_rate
         self.max_phases = int(math.floor(60.0/self.heart_rate/(8*self.TR)))
         #self.max_phases = 1
-        testphase_samples = generate_phase_samples(self.Ny, self.Nz, self.fov, self.max_phases, base_seed=32)
+        testphase_samples = generate_phase_samples(self.Ny, self.Nz, self.fov, self.max_phases, undersampling_factor=self.undersampling_factor, base_seed=32,
+                                                   center_percent_y=self.center_percent_y,
+                                                   center_percent_z=self.center_percent_z)
         self.phase_samples = np.array(testphase_samples)
         #self.max_phases = 1
         self.elliptical_scanning=True
@@ -221,6 +230,10 @@ class MRISequence:
 
             # Acceleration and Dynamic parameters
             'undersampling_factor': self.undersampling_factor,
+            'fullysampled_center': [
+                int((self.center_percent_y / 100) * self.Ny),
+                int((self.center_percent_z / 100) * self.Nz)
+                ],
             'venc': self.venc.tolist() if hasattr(self.venc, 'tolist') else self.venc,
             #'n_phases': self.phase_samples.tolist() if hasattr(self.phase_samples, 'tolist') else self.phase_samples,
             'CardiacNumberofImages': len(self.phase_samples),
@@ -504,8 +517,9 @@ class MRISequence:
         gz_vel = self.make_gradient('z', z_moment_params, flow_g_start=flow_g_start,
                                     additional_params={'gmax': 50, 'smax': 120.0})
         # spoiling
-        gx_spoil = pp.make_trapezoid(channel='x', area=2 * self.Nx * self.delta_kx, system=self.sys)
-        gz_spoil = pp.make_trapezoid(channel='z', area=4 / self.slice_thickness - areaz, system=self.sys)
+        gx_spoil = pp.make_trapezoid(channel='x', area=self.crusher_x_cycles * self.Nx * self.delta_kx, system=self.sys)
+        gz_spoil = pp.make_trapezoid(channel='z', area=self.crusher_z_cycles / self.slice_thickness - areaz,
+                                     system=self.sys)
 
         # calculate delays
         delay_TE = math.ceil((self.TE - pp.calc_duration(gx_vel) - gz.fall_time - gz.flat_time / 2
@@ -587,7 +601,9 @@ if __name__ == "__main__":
     VENC = 1.5
 
     seq = MRISequence(TE=4.5e-3, TR=7e-3, fov=FOV, Nx=int(np.ceil(FOV[0] / RESOLUTION[0])),Ny=int(np.ceil(FOV[1] / RESOLUTION[1])),Nz=int(np.ceil(FOV[2] / RESOLUTION[2])),
-                      Nslices=6, venc=VENC, slice_thickness=80e-3, alpha=10, bandwidth=1e3, tbw=2, heart_rate=TRIG_TIME, undersampling_factor=9)
+                      Nslices=6, venc=VENC, slice_thickness=80e-3, alpha=10, bandwidth=1e3, tbw=2, heart_rate=TRIG_TIME,undersampling_factor=9,
+                      center_percent_y=20, center_percent_z=35, rf_spoil_inc=117.0,
+                      crusher_x_cycles=2, crusher_z_cycles=4)
 
     # M1 values in mT*ms^2/m
     venc_values = [
