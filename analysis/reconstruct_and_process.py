@@ -129,10 +129,15 @@ def reconstruct_and_process_all(data_dir, venc_cms=20, use_gpu=True, ecalib_r='2
         phase_diff_y = np.angle(recon[..., 2] * np.conj(recon[..., 0]))
         phase_diff_z = np.angle(recon[..., 3] * np.conj(recon[..., 0]))
         phase_diffs = np.stack([phase_diff_x, phase_diff_y, phase_diff_z], axis=-1)
-
+        
         # Compute velocities in m/s (ORMIR-MIDS requires m/s)
         velocities_ms = (phase_diffs / np.pi) * (venc_cms / 100.0)
-
+        for axis in range(3):  # x, y, z
+        
+            temporal_mean = np.mean(velocities_ms[:, :, :, :, axis], axis=3, keepdims=True)
+            # Subtract voxel-wise temporal mean from every phase
+            velocities_ms[:, :, :, :, axis] -= temporal_mean
+        
         mag_data = np.abs(recon[..., 0])
         mask = mag_data > 0.10 * np.max(mag_data)
         velocities_ms = velocities_ms * mask[..., np.newaxis]
