@@ -105,11 +105,28 @@ class Geometry:
         cen = np.array([-NP, NR, -NS]) / 2 + np.array([0, 0, 0.5])
 
         result = self.prs @ affine(t, cen)
-        result[0:3, 3] -= np.array(self.table_position)
+        result[0:3, 3] += np.array(self.table_position)
 
         # Swap cols 0,1 and apply sign corrections to match DICOM convention
         result[:, [0, 1]] = result[:, [1, 0]]
+        result[0, 2] = self.pixel_size[1]
+        result[2, 0] = self.pixel_size[2]
         result *= SIGN_CORRECTION
+
+        # --- Fix to make it openable with ITKSnap ---
+        R_scaled = result[:3, :3]
+        spacing = np.linalg.norm(R_scaled, axis=0)       # voxel spacing per axis
+        R = R_scaled / spacing                            # unnormalized direction cosines
+        # Nearest proper orthonormal rotation via SVD (polar decomposition)
+        U, _, Vt = np.linalg.svd(R)
+        R_ortho = U @ Vt
+        if np.linalg.det(R_ortho) < 0:                    # keep it a proper rotation (det = +1)
+            U[:, -1] *= -1
+            R_ortho = U @ Vt
+        result_fixed = result.copy()
+        result_fixed[:3, :3] = R_ortho * spacing          # reapply spacing
+        print("max deviation fixed:", np.max(np.abs(result_fixed[:3, :3] - result[:3, :3])))
+        result = result_fixed
 
         result[np.abs(result) < 1e-4] = 0.0
         return result
