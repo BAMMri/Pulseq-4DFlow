@@ -58,6 +58,8 @@ For BART toolbox installation, follow the instructions at the [BART website](htt
 git clone https://codeberg.org/mrirecon/bart.git
 export PYTHONPATH=$PYTHONPATH:"$(pwd)/bart/python"
 ```
+**Note for Windows Users:** 
+BART does not support native Windows execution. If you are on Windows, you must run this repository inside **Windows Subsystem for Linux (WSL2)** with NVIDIA drivers configured for WSL if GPU acceleration is needed.
 
 ## Usage
 For a usage example, refer to the following Google Colab: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1KA2dQRTU1l7U4Darnd9UKPh657nCDPp5#scrollTo=Q05HA9ElTfg6)
