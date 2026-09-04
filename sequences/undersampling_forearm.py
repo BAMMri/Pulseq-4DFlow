@@ -659,7 +659,7 @@ if __name__ == "__main__":
     print('Sequence ready')
     seq.seq.set_definition('FOV', seq.fov)
     seq.seq.set_definition('Name', 'gre3d')
-    seq.seq.write(f'US9_perc24_23_{TRIG_TIME}_PHS{max_phases}_FOV{int(FOV[0] * 1000)}x{int(FOV[1] * 1000)}x{int(FOV[2] * 1000)}_Venc{int(VENC * 100)}.seq')
+    seq.seq.write(f'US9_perc20_20_{TRIG_TIME}_PHS{max_phases}_FOV{int(FOV[0] * 1000)}x{int(FOV[1] * 1000)}x{int(FOV[2] * 1000)}_Venc{int(VENC * 100)}.seq')
 
 
     if PLOT_KSPACE:
