@@ -83,10 +83,7 @@ def setup_sampling(Ny, Nz, fov, undersampling_factor=9, center_percent_y=24, cen
     return list(zip(ky_coords, kz_coords))
 
 
-def __init__(self, TE, TR, fov, Nx, Ny, Nz, Nslices, venc, slice_thickness, alpha, bandwidth, tbw, heart_rate,
-                 undersampling_factor,
-                 center_percent_y=20, center_percent_z=20, rf_spoil_inc=117.0,
-                 crusher_x_cycles=2, crusher_z_cycles=4):
+def generate_phase_samples(Ny, Nz, fov, num_phases, undersampling_factor=9,center_percent_y=20, center_percent_z=20, rf_spoil_inc=117.0,crusher_x_cycles=2, crusher_z_cycles=4,base_seed=32):
     phase_samples = []
     min_samples = float('inf')
 
