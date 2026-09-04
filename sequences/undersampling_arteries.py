@@ -593,7 +593,7 @@ if __name__ == "__main__":
 
     DO_TRIGGERING=True
     PLOT_SEQUENCE=False
-    PLOT_KSPACE=False
+    PLOT_KSPACE=False #might be very ehavy to plot the whole k-space, set triggering to False and phases to 1 to make it lighter
     TRIG_TIME = 80 #1.52
  
     RESOLUTION = [1.5e-3, 1.5e-3, 1.5e-3]
