@@ -114,7 +114,9 @@ def is_within_ellipse(y, z, y_max, z_max, ellipse_radius):
 
 
 class MRISequence:
-    def __init__(self, TE, TR, fov, Nx, Ny, Nz, Nslices, venc, slice_thickness, alpha, bandwidth, tbw, heart_rate, undersampling_factor):
+    def __init__(self, TE, TR, fov, Nx, Ny, Nz, Nslices, venc, slice_thickness, alpha, bandwidth, tbw, heart_rate,
+                 undersampling_factor, center_percent_y=20, center_percent_z=20, rf_spoil_inc=117.0,
+                 crusher_x_cycles=2, crusher_z_cycles=4):
         # Initialize sequence parameters
         self.TE = TE
         self.TR = TR
