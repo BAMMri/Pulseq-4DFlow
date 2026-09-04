@@ -592,7 +592,7 @@ if __name__ == "__main__":
 
     DO_TRIGGERING=True
     PLOT_SEQUENCE=False
-    PLOT_KSPACE=False
+    PLOT_KSPACE=False  #might be very heavy to plot all points, you can turn off triggering and set the phases to 1 to make it lighter
     TRIG_TIME = 1.52  #1.52
 
     RESOLUTION = [1.5e-3, 1.5e-3, 1.5e-3]
